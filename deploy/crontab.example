@@ -1,4 +1,4 @@
 # Creditcoin Payout 자동 실행
-# 매일 11:07 서버 로컬 타임 기준
+# 매일 11:10 서버 로컬 타임 기준
 # 설치: crontab -l | cat - deploy/crontab.example | crontab -
-7 11 * * * cd /home/ubuntu/creditcoin-payout && /home/ubuntu/.local/bin/uv run creditcoin-payout >> /home/ubuntu/creditcoin-payout/logs/cron.log 2>&1
+10 11 * * * cd /home/odeothx/wrk/creditcoin-payout && uv run creditcoin-payout >> /home/odeothx/wrk/creditcoin-payout/logs/cron.log 2>&1

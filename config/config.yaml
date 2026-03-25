@@ -5,15 +5,15 @@ rpc:
 
 validators:
   - stash: "5G9TuCM8NtpxXw7mYXvmsbRKdQmoYTs1GEJsSg5tNUuFTpdf"
-    name: "Validator-1"
+    name: "odeothx"
   - stash: "5FRuv3BiBhY87DWPtQqn827Bow5a1VmQQGzUvkheJWXmFwMD"
-    name: "Validator-2"
+    name: "odeothx2"
   - stash: "5Fuj2qaV39sAZTDCPavjRGxGJxTHThCjCHg2vgymCSF1hZfY"
-    name: "Validator-3"
+    name: "odeothx3"
   - stash: "5FF5VyM2AAnkUApV6eH7ynsNug8Ng7o8r7vvL6BCBMD4bRdu"
-    name: "Validator-4"
+    name: "odeothx4"
   - stash: "5FL9Ew83tQNCUpJQFg24q4e57rUdYxWbmzjdQHE1XqQQ5vJv"
-    name: "Validator-5"
+    name: "odeothx5"
 
 controller:
   address: "5H5wrwyNM4bsnt7ngPsiUCfFi34ho5gRMKjwJ2sHytpbWnRi"
