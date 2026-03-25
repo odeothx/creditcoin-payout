@@ -1,0 +1,18 @@
+# 시크릿
+.env
+
+# uv 캐시
+.venv/
+__pycache__/
+*.pyc
+*.py[oc]
+
+# 로그
+logs/*.log
+logs/heartbeat
+
+# 빌드
+build/
+dist/
+wheels/
+*.egg-info/

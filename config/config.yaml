@@ -1,0 +1,37 @@
+rpc:
+  endpoint: "ws://localhost:9944"
+  fallback_endpoint: "wss://mainnet3.creditcoin.network"
+  timeout: 30
+
+validators:
+  - stash: "5G9TuCM8NtpxXw7mYXvmsbRKdQmoYTs1GEJsSg5tNUuFTpdf"
+    name: "Validator-1"
+  - stash: "5FRuv3BiBhY87DWPtQqn827Bow5a1VmQQGzUvkheJWXmFwMD"
+    name: "Validator-2"
+  - stash: "5Fuj2qaV39sAZTDCPavjRGxGJxTHThCjCHg2vgymCSF1hZfY"
+    name: "Validator-3"
+  - stash: "5FF5VyM2AAnkUApV6eH7ynsNug8Ng7o8r7vvL6BCBMD4bRdu"
+    name: "Validator-4"
+  - stash: "5FL9Ew83tQNCUpJQFg24q4e57rUdYxWbmzjdQHE1XqQQ5vJv"
+    name: "Validator-5"
+
+controller:
+  address: "5H5wrwyNM4bsnt7ngPsiUCfFi34ho5gRMKjwJ2sHytpbWnRi"
+
+payout:
+  max_eras_per_tx: 1
+  retry_count: 3
+  retry_delay_sec: 10
+  depth_eras: 84
+  tx_interval_sec: 6
+
+balance:
+  min_balance_ctc: 1.0
+
+logging:
+  level: "INFO"
+  format: "json"
+  file: "logs/payout.log"
+  max_bytes: 10485760
+  backup_count: 7
+  heartbeat_file: "logs/heartbeat"
