@@ -1,6 +1,6 @@
 # Creditcoin Payout 자동화 프로그램
 
-Creditcoin 네트워크 Validator들을 위한 `payoutStakers` (Paged Exposure 포함) 트랜잭션 자동행 도구입니다.
+Creditcoin 네트워크 Validator들을 위한 `payoutStakers` (Paged Exposure 포함) 트랜잭션 자동화 도구입니다.
 
 [English README](README.md)
 
