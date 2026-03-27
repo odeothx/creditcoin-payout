@@ -1,4 +1,5 @@
 # Creditcoin Payout 자동 실행
 # 매일 11:10 서버 로컬 타임 기준
 # 설치: crontab -l | cat - deploy/crontab.example | crontab -
-10 11 * * * cd /home/odeothx/wrk/creditcoin-payout && uv run creditcoin-payout >> /home/odeothx/wrk/creditcoin-payout/logs/cron.log 2>&1
+# 경로를 실제 프로젝트가 설치된 디렉토리로 변경해서 사용하세요.
+10 11 * * * cd /path/to/creditcoin-payout && .venv/bin/creditcoin-payout >> /path/to/creditcoin-payout/logs/cron.log 2>&1

@@ -29,6 +29,9 @@ from creditcoin_payout.validator_checker import ValidatorChecker
 
 logger = structlog.get_logger(__name__)
 
+# 현재 스크립트 위치 기준으로 프로젝트 루트 계산 (src/creditcoin_payout/main.py -> 루트)
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+
 # Graceful shutdown 플래그
 _shutdown_requested = False
 _payout_executor: PayoutExecutor | None = None
@@ -37,8 +40,11 @@ _payout_executor: PayoutExecutor | None = None
 def load_config(config_path: str = "config/config.yaml") -> dict:
     """YAML 설정 파일을 로드한다."""
     path = Path(config_path)
+    if not path.is_absolute():
+        path = PROJECT_ROOT / path
+
     if not path.exists():
-        raise FileNotFoundError(f"설정 파일을 찾을 수 없습니다: {config_path}")
+        raise FileNotFoundError(f"설정 파일을 찾을 수 없습니다: {path}")
 
     with open(path, encoding="utf-8") as f:
         config = yaml.safe_load(f)
@@ -49,13 +55,18 @@ def load_config(config_path: str = "config/config.yaml") -> dict:
 def setup_logging(cfg: dict) -> None:
     """structlog 및 Python 표준 로깅을 초기화한다."""
     log_level = getattr(logging, cfg.get("level", "INFO").upper(), logging.INFO)
-    log_file = cfg.get("file", "logs/payout.log")
+    log_file_str = cfg.get("file", "logs/payout.log")
+    
+    log_file = Path(log_file_str)
+    if not log_file.is_absolute():
+        log_file = PROJECT_ROOT / log_file
+        
     max_bytes = cfg.get("max_bytes", 10485760)
     backup_count = cfg.get("backup_count", 7)
     log_format = cfg.get("format", "text")
 
     # 로그 디렉토리 생성
-    log_dir = Path(log_file).parent
+    log_dir = log_file.parent
     log_dir.mkdir(parents=True, exist_ok=True)
 
     # structlog 프로세서 설정
@@ -91,7 +102,7 @@ def setup_logging(cfg: dict) -> None:
     # 핸들러 설정 (파일 및 표준 출력)
     handlers: list[logging.Handler] = [logging.StreamHandler(sys.stdout)]
     file_handler = RotatingFileHandler(
-        log_file, maxBytes=max_bytes, backupCount=backup_count, encoding="utf-8"
+        str(log_file), maxBytes=max_bytes, backupCount=backup_count, encoding="utf-8"
     )
     handlers.append(file_handler)
 
@@ -106,6 +117,9 @@ def setup_logging(cfg: dict) -> None:
 def update_heartbeat(heartbeat_path: str, status: str = "completed") -> None:
     """실행 완료 시각을 heartbeat 파일에 기록한다."""
     path = Path(heartbeat_path)
+    if not path.is_absolute():
+        path = PROJECT_ROOT / path
+        
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps({
         "last_run": datetime.now(timezone.utc).isoformat(),
@@ -219,7 +233,8 @@ def main() -> None:
     signal.signal(signal.SIGINT, graceful_shutdown)
 
     # .env 로드
-    load_dotenv()
+    env_path = PROJECT_ROOT / ".env"
+    load_dotenv(dotenv_path=env_path)
 
     # 설정 로드
     config = load_config()

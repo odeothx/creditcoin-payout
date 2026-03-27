@@ -68,6 +68,10 @@ uv run creditcoin-payout
 
 ### Scheduled Execution (Cron)
 Add a cron job to run daily (e.g., at 11:10 AM):
+
+> [!NOTE]
+> Before applying, edit `deploy/crontab.example` and change `/path/to/creditcoin-payout` to your actual absolute project installation path.
+
 ```bash
 crontab -l | cat - deploy/crontab.example | crontab -
 ```

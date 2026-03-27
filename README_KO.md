@@ -68,6 +68,10 @@ uv run creditcoin-payout
 
 ### 정기 실행 등록 (Cron)
 매일 정해진 시각(예: 오전 11:10)에 실행되도록 cron에 등록합니다:
+
+> [!NOTE]
+> 등록하기 전에 `deploy/crontab.example` 파일을 열어 `/path/to/creditcoin-payout` 부분을 실제 프로젝트가 설치된 절대 경로로 변경해주세요.
+
 ```bash
 crontab -l | cat - deploy/crontab.example | crontab -
 ```
