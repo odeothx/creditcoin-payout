@@ -52,44 +52,30 @@ def setup_logging(cfg: dict) -> None:
     log_file = cfg.get("file", "logs/payout.log")
     max_bytes = cfg.get("max_bytes", 10485760)
     backup_count = cfg.get("backup_count", 7)
-    log_format = cfg.get("format", "json")
+    log_format = cfg.get("format", "text")
 
     # 로그 디렉토리 생성
     log_dir = Path(log_file).parent
     log_dir.mkdir(parents=True, exist_ok=True)
 
-    # 핸들러 설정
-    handlers: list[logging.Handler] = [logging.StreamHandler(sys.stdout)]
-
-    file_handler = RotatingFileHandler(
-        log_file, maxBytes=max_bytes, backupCount=backup_count, encoding="utf-8"
-    )
-    handlers.append(file_handler)
-
-    logging.basicConfig(
-        format="%(message)s",
-        level=log_level,
-        handlers=handlers,
-        force=True,
-    )
-
     # structlog 프로세서 설정
     shared_processors = [
-        structlog.stdlib.add_log_level,
-        structlog.stdlib.add_logger_name,
+        structlog.contextvars.merge_contextvars,
+        structlog.processors.add_log_level,
         structlog.processors.TimeStamper(fmt="iso"),
         structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
         structlog.processors.UnicodeDecoder(),
     ]
 
     if log_format == "json":
         renderer = structlog.processors.JSONRenderer()
     else:
-        renderer = structlog.dev.ConsoleRenderer()
+        # Terminal 및 로그 파일 가독성을 위해 ConsoleRenderer 사용
+        renderer = structlog.dev.ConsoleRenderer(colors=True)
 
     structlog.configure(
-        processors=[
-            *shared_processors,
+        processors=shared_processors + [
             structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
         ],
         logger_factory=structlog.stdlib.LoggerFactory(),
@@ -102,8 +88,19 @@ def setup_logging(cfg: dict) -> None:
         foreign_pre_chain=shared_processors,
     )
 
-    for handler in logging.root.handlers:
+    # 핸들러 설정 (파일 및 표준 출력)
+    handlers: list[logging.Handler] = [logging.StreamHandler(sys.stdout)]
+    file_handler = RotatingFileHandler(
+        log_file, maxBytes=max_bytes, backupCount=backup_count, encoding="utf-8"
+    )
+    handlers.append(file_handler)
+
+    for handler in handlers:
         handler.setFormatter(formatter)
+        handler.setLevel(log_level)
+
+    logging.root.handlers = handlers
+    logging.root.setLevel(log_level)
 
 
 def update_heartbeat(heartbeat_path: str, status: str = "completed") -> None:

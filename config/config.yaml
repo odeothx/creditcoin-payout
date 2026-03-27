@@ -30,7 +30,7 @@ balance:
 
 logging:
   level: "INFO"
-  format: "json"
+  format: "text"
   file: "logs/payout.log"
   max_bytes: 10485760
   backup_count: 7
