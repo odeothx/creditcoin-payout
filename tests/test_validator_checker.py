@@ -145,7 +145,8 @@ class TestCheckAll:
 
         validators = [
             {"stash": "5Gactive...", "name": "Validator-1"},
-            {"stash": "5Gwaiting...", "name": "Validator-2"},
+            {"stash": "5Gwaiting_with_eras...", "name": "Validator-2"},
+            {"stash": "5Gwaiting_no_eras...", "name": "Validator-3"},
         ]
 
         with patch.object(checker, "get_current_era", return_value=1523), \
@@ -153,17 +154,29 @@ class TestCheckAll:
              patch.object(checker, "get_unclaimed_eras") as mock_unclaimed, \
              patch.object(checker, "get_page_count", return_value=1):
 
+            # Validator-1: Active, with eras
+            # Validator-2: Inactive, with eras (Should NOT be skipped anymore)
+            # Validator-3: Inactive, NO eras (Should be skipped)
             mock_active.side_effect = lambda stash, era: stash == "5Gactive..."
-            mock_unclaimed.return_value = [1521, 1522]
+            mock_unclaimed.side_effect = lambda stash, era, depth: (
+                [1521, 1522] if stash in ("5Gactive...", "5Gwaiting_with_eras...") else []
+            )
 
             results = checker.check_all(validators, depth=84)
 
-        assert len(results) == 2
+        assert len(results) == 3
 
         # Validator-1: Active
+        assert results[0].name == "Validator-1"
         assert results[0].is_active is True
         assert results[0].unclaimed_eras == [1521, 1522]
 
-        # Validator-2: Waiting
+        # Validator-2: Waiting but HAS eras (Should be processed)
+        assert results[1].name == "Validator-2"
         assert results[1].is_active is False
-        assert results[1].unclaimed_eras == []
+        assert results[1].unclaimed_eras == [1521, 1522]
+
+        # Validator-3: Waiting and NO eras (Should be skipped)
+        assert results[2].name == "Validator-3"
+        assert results[2].is_active is False
+        assert results[2].unclaimed_eras == []

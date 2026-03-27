@@ -246,25 +246,25 @@ class PayoutExecutor:
             if self._shutdown_requested:
                 break
 
-            if not status.is_active:
-                summary["skipped"] += 1
-                summary["details"].append({
-                    "validator": status.name,
-                    "era": None,
-                    "page": None,
-                    "status": "skipped",
-                    "tx_hash": None,
-                    "error": "Waiting 상태",
-                })
-                continue
-
             if not status.unclaimed_eras:
-                logger.info(
-                    "no_unclaimed_eras",
-                    validator=status.name,
-                )
+                if not status.is_active:
+                    summary["skipped"] += 1
+                    summary["details"].append({
+                        "validator": status.name,
+                        "era": None,
+                        "page": None,
+                        "status": "skipped",
+                        "tx_hash": None,
+                        "error": "Waiting 상태이며 미수령 내역 없음",
+                    })
+                else:
+                    logger.info(
+                        "no_unclaimed_eras",
+                        validator=status.name,
+                    )
                 continue
 
+            # 미수령 내역이 있으면 실행 (Active 여부와 무관)
             for era in status.unclaimed_eras:
                 if self._shutdown_requested:
                     break

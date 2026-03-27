@@ -168,20 +168,19 @@ class ValidatorChecker:
             name = v["name"]
 
             is_active = self.is_validator_active(stash, current_era)
+            unclaimed = self.get_unclaimed_eras(stash, current_era, depth)
 
-            if not is_active:
+            if not is_active and not unclaimed:
                 logger.warning(
                     "validator_status",
                     validator=name,
                     active=False,
-                    message="Waiting 상태 - Payout 건너뜀",
+                    message="Waiting 상태이며 미수령 보상 없음 - 건너뜀",
                 )
                 results.append(ValidatorStatus(
                     stash=stash, name=name, is_active=False,
                 ))
                 continue
-
-            unclaimed = self.get_unclaimed_eras(stash, current_era, depth)
 
             # 미수령 Era가 있으면 각 Era의 page_count도 확인
             page_count = 1
@@ -192,15 +191,16 @@ class ValidatorChecker:
             logger.info(
                 "validator_status",
                 validator=name,
-                active=True,
+                active=is_active,
                 unclaimed_eras=unclaimed,
                 page_count=page_count,
+                message="Waiting 상태이나 미수령 보상 존재" if not is_active else None,
             )
 
             results.append(ValidatorStatus(
                 stash=stash,
                 name=name,
-                is_active=True,
+                is_active=is_active,
                 unclaimed_eras=unclaimed,
                 page_count=page_count,
             ))

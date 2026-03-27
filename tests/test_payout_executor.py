@@ -164,12 +164,19 @@ class TestExecuteAll:
                 stash="5Gactive...",
                 name="Validator-1",
                 is_active=True,
-                unclaimed_eras=[1521, 1522],
+                unclaimed_eras=[1521],
                 page_count=1,
             ),
             ValidatorStatus(
-                stash="5Gwaiting...",
+                stash="5Gwaiting_with_eras...",
                 name="Validator-2",
+                is_active=False,
+                unclaimed_eras=[1522],
+                page_count=1,
+            ),
+            ValidatorStatus(
+                stash="5Gwaiting_no_eras...",
+                name="Validator-3",
                 is_active=False,
                 unclaimed_eras=[],
                 page_count=1,
@@ -182,10 +189,10 @@ class TestExecuteAll:
             ]
             summary = executor.execute_all(statuses)
 
-        assert summary["success"] == 2  # 2 Eras × 1 page each
-        assert summary["skipped"] == 1  # Validator-2 waiting
+        assert summary["success"] == 2  # Both Validator-1 and Validator-2 (even though waiting)
+        assert summary["skipped"] == 1  # Validator-3 waiting and no eras
         assert summary["failed"] == 0
-        assert len(summary["details"]) == 3  # 2 success + 1 skipped
+        assert len(summary["details"]) == 3
 
     def test_stops_on_fatal_error(self, mock_setup):
         client, substrate, keypair = mock_setup
